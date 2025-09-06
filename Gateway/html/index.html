@@ -1,0 +1,249 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <title>ESP-NOW DASHBOARD</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+  <link rel="icon" href="data:,">
+  <style>
+    html { font-family: Arial; display: inline-block; text-align: center; }
+    p { font-size: 1.2rem; }
+    body { margin: 0; }
+    .topnav { overflow: hidden; background-color: #018657; color: white; font-size: 1.7rem; padding: 10px 0; }
+    .content { padding: 20px; }
+    .card {
+      background-color: #4CAF50; /* Đảm bảo nền màu xanh cho tất cả thẻ */
+      box-shadow: 2px 2px 12px 1px rgba(140,140,140,.5);
+      padding: 15px;
+      color: white;
+      border-radius: 10px; /* Thêm bo góc để thẻ trông đẹp hơn */
+      margin: 10px; /* Thêm khoảng cách giữa các thẻ */
+    }
+    .cards {
+      max-width: 700px;
+      margin: 0 auto;
+      display: grid;
+      grid-gap: 2rem;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    }
+    .reading { font-size: 2.8rem; }
+    .packet { color: #bebebe; }
+    .slider {
+      width: 50%;
+      margin: 10px 0;
+      -webkit-appearance: none;
+      appearance: none;
+      height: 8px;
+      background: #ddd;
+      border-radius: 5px;
+      outline: none;
+    }
+    .slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 20px;
+      height: 20px;
+      background: #018657;
+      border-radius: 50%;
+      cursor: pointer;
+    }
+    .slider::-moz-range-thumb {
+      width: 20px;
+      height: 20px;
+      background: #018657;
+      border-radius: 50%;
+      cursor: pointer;
+    }
+    .button-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: 20px 0;
+    }
+    .button-container button {
+      background-color: #018657;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      margin: 0 10px;
+      font-size: 1rem;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+    .button-container button:hover {
+      background-color: #016845;
+    }
+
+    /* Style cho ô nhập khoảng thời gian */
+    .input-field {
+      width: 80px;
+      padding: 10px;
+      font-size: 1rem;
+      border: 2px solid #018657;
+      border-radius: 5px;
+      text-align: center;
+      margin-left: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="topnav">
+    <h3>GROUP 11 DASHBOARD</h3>
+  </div>
+
+  <div class="button-container">
+    <button onclick="updateInterval()">Update Interval</button>
+    <button onclick="sendThresholdValue()">Update Temperature Threshold</button>
+  </div>
+  
+  <div class="controls-container">
+    <!-- Thanh trượt điều chỉnh ngưỡng nhiệt độ -->
+    <label for="thresholdSlider">Set Threshold Temperature:</label>
+    <input type="range" id="thresholdSlider" class="slider" min="0" max="100" value="25" oninput="updateThresholdValue(this.value)">
+    <p>Threshold: <span id="thresholdValue">25</span> &deg;C</p>
+
+    <!-- Ô chỉnh thời gian lấy dữ liệu -->
+    <label for="dataInterval">Data Interval (seconds):</label>
+    <input type="number" id="dataInterval" class="input-field" value="20" min="1" onchange="updateIntervalDisplay()">
+    <p>Current Interval: <span id="intervalValue">20</span> seconds</p>
+  </div>
+
+  <div class="content">
+    <div class="cards">
+      <!-- Các thẻ Sensor (board) -->
+      <div class="card">
+        <h4 id="card1"><i class="fas fa-leaf"></i> </h4>
+        <p><span class="reading"><span id="a1"></span> &deg;C</span></p>
+      </div>
+
+      <div class="card">
+        <h4 id="card2"><i class="fas fa-leaf"></i> </h4>
+        <p><span class="reading"><span id="b1"></span> &deg;C</span></p>
+      </div>
+      <div class="card">
+        <h4 id="card3"><i class="fas fa-leaf"></i> </h4>
+        <p><span class="reading"><span id="a2"></span> &deg;C</span></p>
+      </div>
+
+      <div class="card">
+        <h4 id="card4"><i class="fas fa-leaf"></i> </h4>
+        <p><span class="reading"><span id="b2"></span> &deg;C</span></p>
+      </div>
+      <div class="card">
+        <h4 id="card5"><i class="fas fa-leaf"></i> </h4>
+        <p><span class="reading"><span id="a3"></span> &deg;C</span></p>
+      </div>
+
+      <div class="card">
+        <h4 id="card6"><i class="fas fa-leaf"></i> </h4>
+        <p><span class="reading"><span id="b3"></span> &deg;C</span></p>
+      </div>
+      <div class="card">
+        <h4 id="card7"><i class="fas fa-leaf"></i> </h4>
+        <p><span class="reading"><span id="a4"></span> &deg;C</span></p>
+      </div>
+
+      <div class="card">
+        <h4 id="card8"><i class="fas fa-leaf"></i> </h4>
+        <p><span class="reading"><span id="b4"></span> &deg;C</span></p>
+      </div>
+      <div class="card">
+        <h4 id="card9"><i class="fas fa-leaf"></i> </h4>
+        <p><span class="reading"><span id="a5"></span> &deg;C</span></p>
+      </div>
+
+      <div class="card">
+        <h4 id="card10"><i class="fas fa-leaf"></i> </h4>
+        <p><span class="reading"><span id="b5"></span> &deg;C</span></p>
+      </div>
+      <div class="card">
+        <h4 id="card11"><i class="fas fa-leaf"></i> </h4>
+        <p><span class="reading"><span id="a6"></span> &deg;C</span></p>
+      </div>
+
+      <div class="card">
+        <h4 id="card12"><i class="fas fa-leaf"></i> </h4>
+        <p><span class="reading"><span id="b6"></span> &deg;C</span></p>
+      </div>
+
+      <!-- Các thẻ Sensor khác -->
+    </div>
+  </div>
+
+<script>
+let intervalTime = 20000; // mặc định là 1 giây (1000ms)
+
+function updateThresholdValue(value) {
+    document.getElementById("thresholdValue").innerText = value;
+}
+
+function sendThresholdValue() {
+    // Lấy giá trị hiện tại của ngưỡng từ giao diện
+    const thresholdValue = document.getElementById("thresholdValue").innerText;
+
+    // Tạo một XMLHttpRequest để gửi dữ liệu
+    const xhttp = new XMLHttpRequest();
+    xhttp.open("POST", "/temperatureThreshold", true);
+    xhttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+
+    // Gửi giá trị ngưỡng tới server
+    xhttp.send(thresholdValue);
+}
+
+function updateIntervalDisplay() {
+    // Cập nhật giá trị của ô hiển thị
+    document.getElementById("intervalValue").innerText = document.getElementById("dataInterval").value;
+}
+
+function updateInterval() {
+    intervalTime = document.getElementById("dataInterval").value * 1000; // chuyển đổi thành ms
+    clearInterval(dataInterval);
+    dataInterval = setInterval(fetchData, intervalTime); // Cập nhật thời gian lấy dữ liệu
+
+       // Tạo một XMLHttpRequest để gửi dữ liệu
+    const xhttp = new XMLHttpRequest();
+    xhttp.open("POST", "/IntervalServer", true);
+    // Gửi giá trị ngưỡng tới server
+    xhttp.send(intervalTime);
+}
+
+function fetchData() {
+    const xhttp1 = new XMLHttpRequest();
+    xhttp1.onreadystatechange = function(){
+       const obj = JSON.parse(this.responseText);
+      // Cập nhật địa chỉ lên các thẻ tương ứng
+      document.getElementById('card1').innerText = obj.sensors[0].address;
+      document.getElementById('card2').innerText = obj.sensors[1].address;
+      document.getElementById('card3').innerText = obj.sensors[2].address;
+      document.getElementById('card4').innerText = obj.sensors[3].address;
+      document.getElementById('card5').innerText = obj.sensors[4].address;
+      document.getElementById('card6').innerText = obj.sensors[5].address;
+      document.getElementById('card7').innerText = obj.sensors[6].address;
+      document.getElementById('card8').innerText = obj.sensors[7].address;
+      document.getElementById('card9').innerText = obj.sensors[8].address;
+      document.getElementById('card10').innerText = obj.sensors[9].address;
+      document.getElementById('card11').innerText = obj.sensors[10].address;
+      document.getElementById('card12').innerText = obj.sensors[11].address;
+      // Cập nhật giá trị nhiệt độ lên các thẻ tương ứng
+      document.getElementById('a1').innerText = obj.sensors[0].temperature1;
+      document.getElementById('b1').innerText = obj.sensors[1].temperature1;
+      document.getElementById('a2').innerText = obj.sensors[2].temperature1;
+      document.getElementById('b2').innerText = obj.sensors[3].temperature1;
+      document.getElementById('a3').innerText = obj.sensors[4].temperature1;
+      document.getElementById('b3').innerText = obj.sensors[5].temperature1;
+      document.getElementById('a4').innerText = obj.sensors[6].temperature1;
+      document.getElementById('b4').innerText = obj.sensors[7].temperature1;
+      document.getElementById('a5').innerText = obj.sensors[8].temperature1;
+      document.getElementById('b5').innerText = obj.sensors[9].temperature1;
+      document.getElementById('a6').innerText = obj.sensors[10].temperature1;
+      document.getElementById('b6').innerText = obj.sensors[11].temperature1;
+    }
+    xhttp1.open("GET", "/getdatasensor", true);
+    xhttp1.send();
+}
+
+// Mặc định bắt đầu lấy dữ liệu mỗi 1 giây
+let dataInterval = setInterval(fetchData, intervalTime);
+</script>
+</body>
+</html>
