@@ -63,6 +63,6 @@ Clone this repository:
 *   **Scalability:** Easily add more nodes by registering new IDs at the Gateway.
 
 ---
-**Author:** [Your Name]  
-**Contact:** [Your Email/LinkedIn]  
+**Author:** [Dinh-Tu (me)]  
+**Contact:** [[LinkedIn](https://www.linkedin.com/in/tu-luu-dinh-6674582b8/)]  
 **Project Date:** December 2024
